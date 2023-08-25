@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link rel = "stylesheet" Type="text/css" href = "Long.css" >
+        <basefont family = "Arial" >
+        <title> Tutorial: DDM and decision making </title>
+        <meta name = "author" content = "Long Ding" />
+        <meta name = "keyword" content = "drift-diffusion model, perceptual decision, choice, reaction time" />
+        <meta name = "description" content = " Tutorial for understanding how DDM parameters change psychometric, 
+        mean RT in correct trials and reward outcome for a biased DDM; use theoretical solutions for computing" />
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js" type="text/javascript"></script>
+        <script src="utilities.js" type="text/javascript"></script>
+        <script src="simu_bias.js" type="text/javascript"></script>
+        <script src="compute_pRRT.js" type="text/javascript"></script>
+
+    </head>
+    <body style = background-color:white>
+        <div id = "navbut" align = "middle">
+            <a href = "./DDM_LongDing.html" target = "_self"><button class = "button"><b> Intro </b> </button></a> 
+            <a href = "./description.html" target = "_top" > <button class = "button"><b>Model and task description </b> </button></a>
+            <a href = "./model_bias.html" target = "_top" > <button class = "button" style = "color:blue"> <b>Simu with bias terms </b> </button></a>
+            <a href = "./model_vary.html" target = "_top" > <button class = "button"><b>Parameters~Outcome</b> </button></a>
+        </div>
+        <p> This part of the tutorial examines how the parameters below changes the psychometric function, chronometric function (mean RT), and 
+            reward outcome in a <u>DDM with choice bias</u>. </p>
+        <dl style = "font-size:80%">
+            <dt> Psychometric</dt>
+            <dd>Probability of making the rightward choice as a function of signed coherence; </dd>
+            <dt> Chronometric </dt>
+            <dd>Mean reaction time for leftward and rightward saccades as a function of signed coherence; </dd> 
+        </dl>
+        
+        <table border = "0" cellspacing = "10px" align = "center">
+            <tr>
+                <td class = "polaroid" style = "width:30%"> <h4>Parameters</h4>
+                    <form id = "parameter_bias" action = "" method = "GET">
+                        <script>
+                            var paraNames =     ["a",   "k",    "t0",   "z",    "me",  "RewRight", "RewLeft", "ITICorrect", "errorTimeout"];
+                            var valInputDefault =[3,     6,      0.3,    0.5,      0,      1,      1,      1,      1];
+                            var valRangeStart = [0.1,   0.5,    0.1,    0.1,      -0.5,   0,      0,      0,      0];
+                            var valRangeEnd =   [4,     20,     0.5,    0.9,   0.5,    10,     10,     10,     10];
+                            var valRangeStep =  [0.1,   0.5,    0.05,   0.05,   0.05,   0.5,    0.5,    0.5,    0.5]
+                            var body4table = document.getElementById("parameter_bias");
+                            var tbl = document.createElement("table");
+                            var tblBody = document.createElement("tbody");
+                            let nPara = paraNames.length;
+                            for (j=0; j<nPara; j++) {
+                                let row = document.createElement("tr");
+                                // first column
+                                let cell = document.createElement("td");
+                                let cellText = document.createTextNode(paraNames[j]);
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                                cell.style.width = "50%";
+
+                                // second column
+                                cell = document.createElement("td");
+                                let cellInputText = document.createElement("input");
+                                let br = document.createElement("br");
+                                let cellInputRange = document.createElement("input");
+                                cellInputText.innerHTML += br.outerHTML + cellInputRange.outerHTML;
+                                cell.appendChild(cellInputText);
+                                cell.appendChild(br);
+                                cell.appendChild(cellInputRange);
+                                row.appendChild(cell);
+
+                                cellInputText.id = "para_" + paraNames[j];
+                                cellInputText.setAttribute("class", "ParameterInputBox");
+                                cellInputText.style.width = "75%";
+                                cellInputText.value = valInputDefault[j];
+
+                                cellInputRange.type = "range";
+                                cellInputRange.style.width = "75%";
+                                cellInputRange.min = String(valRangeStart[j]);
+                                cellInputRange.max = String(valRangeEnd[j]);
+                                cellInputRange.step = String(valRangeStep[j]);
+                                cellInputRange.value = String(valInputDefault[j]);
+                                cellInputRange.setAttribute("onchange","updateTextInput(this.value, " + String(j) + ");");
+
+                                // check to make sure values are in range
+                                cellInputText.addEventListener("keyup", function(event) {
+                                    event.preventDefault();
+                                    if (event.keyCode == 13) {
+                                        let x = Number(cellInputText.value);
+                                        if (x < cellInputRange.min) cellInputText.value = cellInputRange.min;
+                                        if (x > cellInputRange.max) cellInputText.value = cellInputRange.max;
+                                        cellInputRange.value = cellInputText.value;
+                                    }
+                                });
+                                
+                                tblBody.appendChild(row);    
+                            }
+                            // set up the Run button
+                            let row = document.createElement("tr");
+                            let cell = document.createElement("td");
+                            row.appendChild(cell);
+                            cell = document.createElement("td");
+                            cellButtonRun = document.createElement("input");
+                            cell.appendChild(cellButtonRun);
+                            row.appendChild(cell);
+
+                            cellButtonRun.type = "button";
+                            cellButtonRun.id = "buttonSubmit";
+                            cellButtonRun.value = "Run";
+                            cellButtonRun.onclick = function (){
+                                run_simu_bias(document.getElementById("parameter_bias"));
+                                return false;
+                            };                            
+                            tblBody.appendChild(row);    
+                            
+                            tbl.appendChild(tblBody);
+                            body4table.appendChild(tbl);
+                        </script>
+                    </form> <br>
+                    <img src = "ddm_bias.jpg" width = "80%" align = "center"/>
+                </td>
+                <td class = "polaroid" style = "width:40%"> <h4>Performance</h4>
+                    <canvas id = "canvasPsych" width ="400" height = "280"> </canvas><br>
+                    <div align = "center"><ul id = "rtLegendList"></ul></div>
+                    <canvas id = "canvasRT" width = "400" height = "350"> </canvas><br>
+                    <script>
+                        var chartPsych = {};
+                        var chartRT = {};
+                        initCharts();
+
+                        let rtLegends = ['Error', 'Correct'];
+                        let ul_rtLegend = document.getElementById("rtLegendList");
+                        for (i=0; i<2; i++) {
+                            var li_rtLegend = document.createElement('li');
+                            li_rtLegend.setAttribute("class", "li_rtlegend");
+                            ul_rtLegend.appendChild(li_rtLegend);
+                            li_rtLegend.innerHTML += rtLegends[i];
+                            li_rtLegend.style.color = chartRT.data.datasets[i].pointBackgroundColor;
+                        }
+                    </script>
+                </td>
+                <td class = "polaroid" style = "width:30%"> <h4>Outcome</h4>
+                    <table border = "0" cellspacing = "15px">
+                        <tr>
+                            <td><div align="center">Accuracy</div></td>
+                            <td><div align="center">Mean RT</div></td>
+                            <td><div align="center">Reward/Trial</div></td>
+                            <td><div align="center">Reward Rate</div></td>
+                        </tr>
+                        <tr>
+                            <td><div align="center"><span id = "txtAccuracy"></span></div></td>
+                            <td><div align="center"><span id = "txtMeanRT"></span></div></td>
+                            <td><div align="center"><span id = "txtRewTrial"></span></td>
+                            <td><div align="center"><span id = "txtRewRate"></span></div></td>
+                        </tr>
+                        <tr>
+                            <td><div align="center"><canvas id="chartAccuracy" width="40" height="400"></canvas></div></td>
+                            <td><div align="center"><canvas id="chartMeanRT" width="40" height="400"></canvas></div></td>
+                            <td><div align="center"><canvas id="chartRewTrial" width="40" height="400"></canvas></div></td>
+                            <td><div align="center"><canvas id="chartRewRate" width="40" height="400"></canvas></div></td>
+                            <script>
+                                var chartOutcome = new Array();
+                                var chartNames = ["chartAccuracy", "chartMeanRT","chartRewTrial", "chartRewRate"];
+                                initOutcomeCharts();
+                            </script>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+            <tr>
+                <td> </td>
+                <td>
+                    <table border = "2px" cellpadding="5" align = "center">
+                        <tr align="center" style = "background-color:bisque">
+                            <td> Sign of <i>Coh</i> </td>
+                            <td> For "%choice" plot </td>
+                            <td> For "RT" plot </td>
+                        </tr>
+                        <tr align="center">
+                            <td> <b><large>+</large></b> </td>
+                            <td> rightward motion </td>
+                            <td> right choice (rightward saccade) </td>
+                        </tr>
+                        <tr align="center">
+                            <td> <b><large>-</large></b> </td>
+                            <td> leftward motion </td>
+                            <td> left choice (leftward saccade) </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+         </table>
+         <script>
+            run_simu_bias(document.getElementById("parameter_bias")); 
+        </script>
+        <p align = "center" > &copy 2017 Long Ding </p>
+    
+    </body>
+</html>

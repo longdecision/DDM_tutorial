@@ -1,0 +1,212 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link rel = "stylesheet" Type="text/css" href = "Long.css" >
+        <basefont family = "Arial" >
+        <title> Tutorial: DDM and decision making </title>
+        <meta name = "author" content = "Long Ding" />
+        <meta name = "keyword" content = "drift-diffusion model, perceptual decision, choice, reaction time" />
+        <meta name = "description" content = " Tutorial for understanding how DDM parameters change psychometric, 
+        mean RT in correct trials and reward outcome for a biased DDM; use theoretical solutions for computing" />
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js" type="text/javascript"></script>
+        <script src="utilities.js" type="text/javascript"></script>
+        <script src="simu_bias.js" type="text/javascript"></script>
+        <script src="compute_pRRT.js" type="text/javascript"></script>
+
+    </head>
+    <body style = background-color:white>
+        <div id = "navbut" align = "middle">
+            <a href = "./DDM_LongDing.html" target = "_self"><button class = "button"><b> Intro </b> </button></a> 
+            <a href = "./description.html" target = "_top" > <button class = "button"><b>Model and task description </b> </button></a>
+            <a href = "./model_bias.html" target = "_top" > <button class = "button"> <b>Simu with bias terms </b> </button></a>
+            <a href = "./model_vary.html" target = "_top" > <button class = "button" style = "color:blue"><b>Parameters~Outcome</b> </button></a>
+        </div>
+        <p> This part of the tutorial visualizes how outcome varies with one or two parameters, with other parameters fixed. 
+            Use the checkboxes to select which parameter(s) to vary. Specify the resolution in the "Steps" inputbox.  </p>
+        <dl style = "font-size:80%">
+            <dt> Accuracy</dt>
+            <dd>Probability of making a correct choice</dd>
+            <dt> Mean RT </dt>
+            <dd>Mean reaction time for a trial (regardless of Coh or correct/error); </dd>
+            <dt> Reward/Trial </dt>
+            <dd>Average reward per trial</dd>
+            <dt> Reward Rate </dt>
+            <dd>Average reward per second </dd> 
+        </dl>
+        
+        <table border = "0" cellspacing = "10px" align = "center">
+            <tr>
+                <td class = "polaroid" style = "width:30%"> <h4>Parameters</h4>
+                    <form id = "parameter_bias" action = "" method = "GET">
+                        <script>
+                            var paraNames =     ["a",   "k",    "t0",   "z",    "me",  "RewRight", "RewLeft", "ITICorrect", "errorTimeout"];
+                            var valInputDefault =[3,     6,      0.3,    0.5,      0,      1,      1,      1,      1];
+                            var valRangeStart = [0.1,   0.5,    0.1,    0.1,      -0.5,   0,      0,      0,      0];
+                            var valRangeEnd =   [4,     20,     0.5,    0.9,   0.5,    10,     10,     10,     10];
+                            var valRangeStep =  [0.1,   0.5,    0.05,   0.05,   0.05,   0.5,    0.5,    0.5,    0.5]
+                            var body4table = document.getElementById("parameter_bias");
+                            var tbl = document.createElement("table");
+                            var tblBody = document.createElement("tbody");
+                            let nPara = paraNames.length;
+                            for (j=0; j<nPara; j++) {
+                                let row = document.createElement("tr");
+                                // first column
+                                let cell = document.createElement("td");
+                                let cellInputCheck = document.createElement("input");
+                                let cellInputCheckLabel = document.createElement("label");
+                                let cellText = document.createTextNode(paraNames[j]);
+                                cellInputCheck.type = "checkbox";
+                                cellInputCheckLabel.setAttribute("class", "check_label");
+                                
+                                cell.appendChild(cellInputCheckLabel);
+                                cell.appendChild(cellInputCheck);
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                                cell.style.width = "40%";
+
+                                // second column
+                                cell = document.createElement("td");
+                                let cellInputText = document.createElement("input");
+                                let br = document.createElement("br");
+                                let cellInputRange = document.createElement("input");
+                                cellInputText.innerHTML += br.outerHTML + cellInputRange.outerHTML;
+                                cell.appendChild(cellInputText);
+                                cell.appendChild(br);
+                                cell.appendChild(cellInputRange);
+                                row.appendChild(cell);
+
+                                cellInputText.id = "para_" + paraNames[j];
+                                cellInputText.setAttribute("class", "ParameterInputBox");
+                                cellInputText.style.width = "75%";
+                                cellInputText.value = valInputDefault[j];
+
+                                cellInputRange.type = "range";
+                                cellInputRange.setAttribute("class", "ParameterRange");
+                                cellInputRange.style.width = "75%";
+                                cellInputRange.min = String(valRangeStart[j]);
+                                cellInputRange.max = String(valRangeEnd[j]);
+                                cellInputRange.step = String(valRangeStep[j]);
+                                cellInputRange.value = String(valInputDefault[j]);
+                                cellInputRange.setAttribute("onchange","updateTextInputRunHeatmap(this.value, " + String(j) + ");");
+
+                                // Customize the check box behavior
+                                cellInputCheck.name = "parameters";
+                                cellInputCheck.id = "checkbox_" + paraNames[j];
+                                cellInputCheck.onchange = function () {
+                                    if (cellInputCheck.checked) {
+                                        let checkboxes = document.getElementsByName("parameters");
+                                        let ncheck = checkboxes.length;
+                                        let numChecked = 0;
+                                        for (i=0; i<ncheck; i++) {
+                                            numChecked += Number(checkboxes[i].checked);
+                                        }
+                                        if (numChecked>2) {
+                                            alert("Can only check up to 2 parameters");
+                                            cellInputCheck.checked = false;
+                                        }
+                                        if (cellInputCheck.checked) {
+                                            cellInputText.disabled = true;
+                                            cellInputRange.disabled = true;
+                                        }
+                                    } else {
+                                        cellInputText.disabled = false;
+                                        cellInputRange.disabled = false;
+                                    }
+                                }
+
+                                // check to make sure values are in range
+                                cellInputText.addEventListener("keyup", function(event) {
+                                    event.preventDefault();
+                                    if (event.keyCode == 13) {
+                                        let x = Number(cellInputText.value);
+                                        if (x < cellInputRange.min) cellInputText.value = cellInputRange.min;
+                                        if (x > cellInputRange.max) cellInputText.value = cellInputRange.max;
+                                        cellInputRange.value = cellInputText.value;
+                                    }
+                                });
+                                
+                                tblBody.appendChild(row);    
+                            }
+                            let row = document.createElement("tr");
+                            // set up input box for nSteps
+                            let cell = document.createElement("td");
+                            
+                            cellInputNSteps = document.createElement("input");
+                            textInputNSteps = document.createElement("label");
+                            let cellText = document.createTextNode(" Steps");
+                            cellInputNSteps.innerHTML += textInputNSteps.innerHTML + cellText.innerHTML;
+                            cell.appendChild(document.createElement("br"));
+                            cell.appendChild(cellInputNSteps);
+                            cell.appendChild(textInputNSteps);
+                            cell.appendChild(cellText);
+                            row.appendChild(cell);
+                            cellInputNSteps.value = "10";
+                            cellInputNSteps.setAttribute("id", "cellInputNSteps");
+                            cellInputNSteps.style.width = "25px";
+                            textInputNSteps.String = " Steps";
+                            textInputNSteps.id = "textInputNSteps";
+                            // check to make sure the Step value is in range (10-30)
+                            cellInputNSteps.addEventListener("keyup", function(event) {
+                                event.preventDefault();
+                                if (event.keyCode == 13) {
+                                    let x = Number(cellInputNSteps.value);
+                                    if (x < 10) cellInputNSteps.value = 10;
+                                    if (x > 30) cellInputNSteps.value = 30;
+                                }
+                            });
+                            
+                            // set up the Run button
+                            cell = document.createElement("td");
+                            row.appendChild(cell);
+                            cell = document.createElement("td");
+                            cellButtonRun = document.createElement("input");
+                            cell.appendChild(cellButtonRun);
+                            row.appendChild(cell);
+
+                            cellButtonRun.type = "button";
+                            cellButtonRun.id = "buttonSubmit";
+                            cellButtonRun.value = "Run";
+                            cellButtonRun.style.color = "red";
+                            cellButtonRun.style.width = "50px";
+                            cellButtonRun.style.height = "30px";
+                            cellButtonRun.onclick = function (){
+                                heatmap_simu(document.getElementById("parameter_bias"), document.getElementsByName("parameters"));
+                                return false;
+                            };                            
+                            tblBody.appendChild(row);    
+                            
+                            tbl.appendChild(tblBody);
+                            body4table.appendChild(tbl);
+                        </script>
+                    </form> <br>
+                    <img src = "ddm_bias.jpg" width = "80%" align = "center"/>
+                </td>
+                <td class = "polaroid" style = "width:70%"> <h4>Outcomes</h4>
+                    <div id = "divOutcome" align = "center" >
+                        <table>
+                            <tr>
+                                <td> <p>Accuracy</p><br><canvas id = "canvasAccuracy" width ="280" height = "280"> </canvas> </td>
+                                <td> <p>Reward/Trial</p><br><canvas id = "canvasRTrial" width ="280" height = "280"> </canvas> </td>
+                            </tr>
+                            <tr>
+                                <td> <p>Mean RT</p><br><canvas id = "canvasMeanRT" width ="280" height = "280"> </canvas> </td>
+                                <td> <p>Reward Rate</p><br><canvas id = "canvasRRate" width ="280" height = "280"> </canvas> </td>
+                            </tr>
+                        </table>
+                    </div><br>
+                    <p align = "center"> "Heatmap" is normalized to the min and max values of each matrix. </p>
+                    <p align = "center"> me > 0: bias toward the rightward choice. </p>
+                    <p align = "center"> z > 0.5: bias toward the rightward choice.  </p>
+                    <script>
+                        var nameOutcome = ["Accuracy", "MeanRT", "RTrial", "RRate"];
+                        var chartOutcome = [];
+                        for (i=0; i<4; i++) {
+                            chartOutcome[i] = initChart('canvas'+nameOutcome[i]);
+                        }
+                    </script>
+                </td>
+            </tr>
+         </table>
+         <p align = "center" > &copy 2017 Long Ding </p>
+    </body>
+</html>

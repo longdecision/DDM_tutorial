@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link rel = "stylesheet" Type="text/css" href = "Long.css" >
+        <basefont family = "Arial" >
+        <title> Tutorial: DDM and decision making </title>
+        <meta name = "author" content = "Long Ding" />
+        <meta name = "keyword" content = "drift-diffusion model, perceptual decision, choice, reaction time" />
+        <meta name = "description" content = " Tutorial for understanding how DDM parameters change psychometric, RT distributions, reward outcome" />
+    </head>
+    <body style = background-color:white>
+        <div id = "navbut" align = "middle">
+            <a href = "./DDM_LongDing.html" target = "_self"><button class = "button"><b> Intro </b> </button></a> 
+            <a href = "./description.html" target = "_top" > <button class = "button" style = "color:blue" ><b>Model and task description </b> </button></a>
+            <a href = "./model_bias.html" target = "_top" > <button class = "button"><b>Simu with bias terms </b> </button></a>
+            <a href = "./model_vary.html" target = "_top" > <button class = "button"><b>Parameters~Outcome</b> </button></a>
+        </div>
+
+        <table border = "0" cellspacing = "10px">
+            <col width = "45%">
+            <col width = "45%">
+            <tr>
+                <td class = "polaroid">
+                    <h1 align = "center" > <font size = "5"> <b>The drift-diffusion model </b> </font></h1>
+                    <img src = "ddm.jpg" class = "img_center" hspace = 10>
+                    <ul><h2><b><font size = "4">Assumptions (for 2-alternative choice tasks) </font></b></h2>
+                        <li> At a given moment, evidence is a random draw from a Gaussian distribution ~ (&mu;, 1); </li>
+                        <li> &mu; is linearly related to stimulus strength <i>Coh </i>;</li>
+                        <li> Evidence is accumulated over time into a decision variable (DV); </li>
+                        <li> There are two decision bounds associated with the two chioces (the distance between the two bounds is <i>a</i>); </li>
+                        <li> If DV reaches the upper bound first, choice 1 is made; alternatively, if DV reaches the lower bound first, chioce 2 is made; in either case, accumulation is terminated; </li>
+                        <li> The time between the start and end of accumulation is the decision time; </li>
+                        <li> Reaction time is the sum of the decision time and non-decision-related processing time (e.g., sensory delay and movement initiation). </li>
+                    </ul>                        
+                </td>
+                <td class = "polaroid">
+                    <h1 align = "center" > <font size = "5"> <b>The dots task used for simulation </b> </font></h1>
+                    <img src = "dots.jpg" class = "img_center" hspace = 10>
+                    <ul><h2><b><font size = "4">Main Features </font></b></h2>
+                        <li> Subject looks at a random-dot kinematogram and decides on the global motion of the dots; </li>
+                        <li> Subject can indicate the decision at any time; </li>
+                        <li> Reaction time (RT) is measured from dots onset to initiation of the decision-indicating action; </li>
+                        <li> Motion direction is constant in a trial; the left/right directions are randomly interleaved across trials; </li>
+                        <li> Motion strength  (expressed as <i>Coh</i>, fraction of dots moving in the same direction) is randomly picked from (0.512, 0.256, 0.128, 0.064, 0.032) for a trial;
+                            Motion strength is constant in a trial but the actual value at a given moment fluctuates; </li>
+                        <li> Correct choices are rewarded; error trials are not rewarded. </li>
+                    </ul>                        
+                </td>
+            </tr>
+            <tfoot>
+                <td colspan="2" > 
+                    <ul><h4>Conventions:</h4>
+                        <li> Rightward motion is associated with positive <i>Coh</i>; </li>
+                        <li> Rightward choice is associated with the upper bound; </li>
+                    </ul>
+                </td>
+            </tfoot>
+        </table>
+        <p align = "center" > &copy 2017 Long Ding </p>
+        
+    </body>
+</html>

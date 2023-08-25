@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang = "en">
+<head>
+    <!-- <link rel = "home" href = "DDM_LongDing.html"> -->
+    <link rel = "stylesheet" Type="text/css" href = "Long.css" >
+    
+    <title> Tutorial: DDM and decision making </title>
+    <meta name = "author" content = "Long Ding" />
+    <meta name = "keyword" content = "drift-diffusion model, perceptual decision, choice, reaction time" />
+    <meta name = "description" content = " Tutorial for understanding how DDM parameters change psychometric, RT distributions, reward outcome" />
+    
+</head>
+<body>
+    <div id = "intro" align = "middle">
+        <img src = "./leaf.jpg" alt = "border image" hspace="20" width = "40" height = "25"/>
+        <b><font size = "5">Welcome to Long's DDM tutorial!</font></large></b> 
+        <img src = "./leaf_right.jpg" alt = "border image" hspace="20" width = "40" height = "25"/>
+        <p align = "justify">
+        The drift-diffusion model has been widely applied to studies of decision making, 
+        thanks to the pioneering work of Ratcliff and others. 
+        With just a few parameters and a conceptually simple process, this model can describe behavioral performance (choice and reaction time) for a whole range of tasks (in humans and animals).
+        As I have learned over the years, however, it is not always straightforward to intuit a prediction from the "simple" DDM; 
+        the best way to develop better intuitions is to play with simulations.
+        This tutorial is intended to make it easier for anyone to play with the basic DDM, without having to write/debug code. 
+        </p>
+        
+        <p align = "justify"> I hope you find this tutorial helpful. </p><br>
+        
+        <!-- Please let <a href = "mailto:lding@mail.med.upenn.edu"> <font color="blue"> <u> me </u> </font></a> know if you suspect a bug anywhere. -->
+    </div>
+
+    <div id = "navbut" align = "middle">
+        <a href = "./DDM_LongDing.html" target = "_self"><button class = "button" style = "color:blue" ><b> Intro </b> </button></a> 
+        <a href = "./description.html" target = "_top" > <button class = "button"><b>Model and task description </b> </button></a>
+        <a href = "./model_bias.html" target = "_top" > <button class = "button"><b>Simu with bias terms </b> </button></a>
+        <a href = "./model_vary.html" target = "_top" > <button class = "button"><b>Parameters~Outcome</b> </button></a>
+    </div>    
+    <br>
+    <ul> <h4>Other helpful resources </h4>
+        <li> <a href = "http://star.psy.ohio-state.edu/wp/"> <b> Roger Ratcliff's webpage </b> </a>, 
+                containing links to seminal papers about the DDM, simulation tools for visualizing DDM-predicted RT distribution, and fitting packages. </li>
+        <li> <a href = "https://www.shadlenlab.columbia.edu/index.html"> <b> Mike Shadlen's webpage </b> </a>,
+                containing links to seminal papers about neural correlates of a DDM-like process for decision making, sample neural dataset. </li>
+        <li> <a href = "http://ski.clps.brown.edu/hddm_docs/index.html"> <b> HDDM developed by Wiecki, Sofer and Frank </b> </a>, 
+                for fitting a hierarchical DDM to data </li>
+        <li> <a href = "http://churchlandlab.labsites.cshl.edu/"> <b> Anne Churchland's webpage </b> </a>, 
+                for code and examples of using a spike-count variance measure to test whether a neural signal reflects DDM or other models </li>
+        <li> <a href = "https://drugowitschlab.hms.harvard.edu/resources/"> <b> Jan Drugowitsch's webpage </b> </a>, 
+                for code to compute first-passage time distributions of a DDM with arbitrary bound timecourse </li>
+    </ul> 
+    <p align = "center" > &copy 2017 Long Ding </p>
+    
+</body>
+</html>
