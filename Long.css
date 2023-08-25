@@ -1,0 +1,106 @@
+body {font-family:Arial, Helvetica, sans-serif}
+
+.button {
+    background-color: whitesmoke; 
+    color: black;
+	text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    height: 50px;
+    width: 300px;
+	-webkit-border-radius: 20px;
+	-khtml-border-radius: 20px;
+	-moz-border-radius: 20px; 
+	border-radius: 20px; 
+}
+
+.img_center {
+    border: 0px solid #ddd;
+    border-radius: 5px;
+    padding: 1px;
+    display: block;
+    margin: auto;
+    max-width:50%;
+    max-height:250px;
+    width: auto;
+    height: auto;    
+}
+
+td.polaroid {
+    width: 40%;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 5px 10px;
+    vertical-align:top;
+}
+
+a { 
+    text-decoration: none; 
+    color:black;
+} 
+
+a.button {
+    background-color: whitesmoke; 
+    color: black;
+	text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    height: 50px;
+    width: 300px;
+    border-radius: 20px;
+	-webkit-border-radius: 20px;
+}
+
+input.ParameterInputBox {
+    width: 80%;
+    padding: 1px 1px;
+    box-sizing: border-box;
+}
+
+canvas {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.range.vertical {
+    -webkit-appearance: slider-vertical;
+    width: 10px;
+    height: 400px;
+    border: 1px solid white;
+    border-radius: 5px;
+    outline: none;
+    background: lightgray;
+    padding: 0;
+    margin: 0;
+    range: false;
+    writing-mode: bt-lr;
+}
+.range.vertical::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    background: lightgray;
+    width: 20px;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; 
+    width: 15px;
+    height: 15px;
+    border-radius: 20px;
+    background-color: blue;
+}
+
+.li_rtlegend {
+    display: inline-block;
+    padding: 10px;
+    font-weight: bold;
+    text-align: left;
+    list-style-type: disc;
+}
+
+.check_label {
+    display: inline;
+}
+
+li {
+    margin: 10px 0;
+}
